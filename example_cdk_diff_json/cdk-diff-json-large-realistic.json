@@ -19,7 +19,7 @@
   },
   "stacks": [
     {
-      "stackName": "NIR-XCA-Int-MainStack",
+      "stackName": "Demo-Service-Int-MainStack",
       "hasDifferences": true,
       "changeSetMode": "readOnly",
       "approvalLevel": "broadening",
@@ -83,7 +83,7 @@
           }
         },
         {
-          "target": "QueryOrchestrationStateMachine/Role/DefaultPolicy",
+          "target": "OrderWorkflowStateMachine/Role/DefaultPolicy",
           "action": "add",
           "statement": {
             "effect": "Allow",
@@ -99,7 +99,7 @@
           }
         },
         {
-          "target": "Iti38QueryHandler/ServiceRole/DefaultPolicy",
+          "target": "OrderQueryHandler/ServiceRole/DefaultPolicy",
           "action": "add",
           "statement": {
             "effect": "Allow",
@@ -109,12 +109,12 @@
               "ssm:GetParameters"
             ],
             "resources": [
-              "arn:aws:ssm:eu-west-2:123456789012:parameter/nir/int/xca/*"
+              "arn:aws:ssm:eu-west-2:123456789012:parameter/demo/int/service/*"
             ]
           }
         },
         {
-          "target": "Iti38QueryHandler/ServiceRole/DefaultPolicy",
+          "target": "OrderQueryHandler/ServiceRole/DefaultPolicy",
           "action": "add",
           "statement": {
             "effect": "Allow",
@@ -128,7 +128,7 @@
           }
         },
         {
-          "target": "GatewayLookupFunction/ServiceRole/DefaultPolicy",
+          "target": "PartnerLookupFunction/ServiceRole/DefaultPolicy",
           "action": "modify",
           "statement": {
             "effect": "Allow",
@@ -137,12 +137,12 @@
               "dynamodb:Query"
             ],
             "resources": [
-              "arn:aws:dynamodb:eu-west-2:123456789012:table/nir-gateway-int"
+              "arn:aws:dynamodb:eu-west-2:123456789012:table/demo-gateway-int"
             ]
           }
         },
         {
-          "target": "GatewayLookupFunction/ServiceRole/DefaultPolicy",
+          "target": "PartnerLookupFunction/ServiceRole/DefaultPolicy",
           "action": "add",
           "statement": {
             "effect": "Allow",
@@ -153,7 +153,7 @@
               "dynamodb:UpdateItem"
             ],
             "resources": [
-              "arn:aws:dynamodb:eu-west-2:123456789012:table/nir-idempotency-int"
+              "arn:aws:dynamodb:eu-west-2:123456789012:table/demo-idempotency-int"
             ]
           }
         },
@@ -167,7 +167,7 @@
               "secretsmanager:GetSecretValue"
             ],
             "resources": [
-              "arn:aws:secretsmanager:eu-west-2:123456789012:secret:nir/xca/legacy-client-cert-*"
+              "arn:aws:secretsmanager:eu-west-2:123456789012:secret:demo/service/legacy-client-cert-*"
             ]
           }
         },
@@ -181,7 +181,7 @@
               "lambda:InvokeFunction"
             ],
             "resources": [
-              "arn:aws:lambda:eu-west-2:123456789012:function:nir-int-xca-reconcile"
+              "arn:aws:lambda:eu-west-2:123456789012:function:demo-int-service-reconcile"
             ]
           }
         },
@@ -195,12 +195,12 @@
               "lambda:InvokeFunction"
             ],
             "resources": [
-              "arn:aws:lambda:eu-west-2:123456789012:function:nir-int-xca-api"
+              "arn:aws:lambda:eu-west-2:123456789012:function:demo-int-service-api"
             ]
           }
         },
         {
-          "target": "SoapIngressHandler/ServiceRole/DefaultPolicy",
+          "target": "MessageIngressHandler/ServiceRole/DefaultPolicy",
           "action": "add",
           "statement": {
             "effect": "Allow",
@@ -231,7 +231,7 @@
       ],
       "securityGroupChanges": [
         {
-          "securityGroup": "XcaAlbSecurityGroup",
+          "securityGroup": "ServiceAlbSecurityGroup",
           "direction": "ingress",
           "protocol": "tcp",
           "port": 443,
@@ -240,7 +240,7 @@
           "new": "10.20.0.0/16,10.21.0.0/16"
         },
         {
-          "securityGroup": "XcaAlbSecurityGroup",
+          "securityGroup": "ServiceAlbSecurityGroup",
           "direction": "ingress",
           "protocol": "tcp",
           "port": 443,
@@ -249,7 +249,7 @@
           "new": "10.22.12.0/24"
         },
         {
-          "securityGroup": "XcaAlbSecurityGroup",
+          "securityGroup": "ServiceAlbSecurityGroup",
           "direction": "ingress",
           "protocol": "tcp",
           "port": 8443,
@@ -285,7 +285,7 @@
           "new": null
         },
         {
-          "securityGroup": "SoapWorkerSecurityGroup",
+          "securityGroup": "MessageWorkerSecurityGroup",
           "direction": "ingress",
           "protocol": "tcp",
           "port": 9443,
@@ -314,7 +314,7 @@
           ]
         },
         {
-          "logicalId": "Iti38QueryHandler",
+          "logicalId": "OrderQueryHandler",
           "resourceType": "AWS::Lambda::Function",
           "action": "modify",
           "propertyChanges": [
@@ -325,7 +325,7 @@
               "newValue": "8c01a93fc6e549ee.zip"
             },
             {
-              "path": "Environment.Variables.LOG_RAW_SOAP",
+              "path": "Environment.Variables.LOG_RAW_PAYLOAD",
               "changeType": "add",
               "newValue": "true"
             },
@@ -337,13 +337,13 @@
             {
               "path": "Environment.Variables.GATEWAY_DDB_TABLE",
               "changeType": "modify",
-              "oldValue": "nir-gateway-int",
-              "newValue": "nir-gateway-int-v2"
+              "oldValue": "demo-gateway-int",
+              "newValue": "demo-gateway-int-v2"
             },
             {
               "path": "Environment.Variables.IDEMPOTENCY_TABLE",
               "changeType": "add",
-              "newValue": "nir-idempotency-int"
+              "newValue": "demo-idempotency-int"
             },
             {
               "path": "MemorySize",
@@ -365,12 +365,12 @@
             }
           ],
           "metadata": {
-            "service": "iti-38",
+            "service": "order-query",
             "runtime": "python3.13"
           }
         },
         {
-          "logicalId": "Iti38QueryHandlerVersion",
+          "logicalId": "OrderQueryHandlerVersion",
           "resourceType": "AWS::Lambda::Version",
           "action": "modify",
           "propertyChanges": [
@@ -385,7 +385,7 @@
           "replacement": true
         },
         {
-          "logicalId": "Iti38QueryHandlerAliasLive",
+          "logicalId": "OrderQueryHandlerAliasLive",
           "resourceType": "AWS::Lambda::Alias",
           "action": "modify",
           "propertyChanges": [
@@ -405,7 +405,7 @@
           ]
         },
         {
-          "logicalId": "GatewayLookupFunction",
+          "logicalId": "PartnerLookupFunction",
           "resourceType": "AWS::Lambda::Function",
           "action": "modify",
           "propertyChanges": [
@@ -433,7 +433,7 @@
           ]
         },
         {
-          "logicalId": "SoapIngressHandler",
+          "logicalId": "MessageIngressHandler",
           "resourceType": "AWS::Lambda::Function",
           "action": "modify",
           "propertyChanges": [
@@ -446,8 +446,8 @@
             {
               "path": "Layers[0]",
               "changeType": "modify",
-              "oldValue": "arn:aws:lambda:eu-west-2:123456789012:layer:nir-powertools:18",
-              "newValue": "arn:aws:lambda:eu-west-2:123456789012:layer:nir-powertools:19"
+              "oldValue": "arn:aws:lambda:eu-west-2:123456789012:layer:demo-powertools:18",
+              "newValue": "arn:aws:lambda:eu-west-2:123456789012:layer:demo-powertools:19"
             },
             {
               "path": "ReservedConcurrentExecutions",
@@ -464,7 +464,7 @@
           ]
         },
         {
-          "logicalId": "XcaApiServiceTaskDef",
+          "logicalId": "ServiceApiServiceTaskDef",
           "resourceType": "AWS::ECS::TaskDefinition",
           "action": "modify",
           "propertyChanges": [
@@ -480,15 +480,15 @@
               "newValue": "false"
             },
             {
-              "path": "ContainerDefinitions[0].Environment[ENABLE_SOAP_BODY_LOGGING]",
+              "path": "ContainerDefinitions[0].Environment[ENABLE_PAYLOAD_LOGGING]",
               "changeType": "add",
               "newValue": "true"
             },
             {
               "path": "ContainerDefinitions[0].Image",
               "changeType": "modify",
-              "oldValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/nir-xca:int-20260506.3",
-              "newValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/nir-xca:int-20260508.7",
+              "oldValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/demo-service:int-20260506.3",
+              "newValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/demo-service:int-20260508.7",
               "requiresReplacement": true
             },
             {
@@ -509,7 +509,7 @@
           "replacement": true
         },
         {
-          "logicalId": "XcaApiService",
+          "logicalId": "ServiceApiService",
           "resourceType": "AWS::ECS::Service",
           "action": "modify",
           "propertyChanges": [
@@ -542,7 +542,7 @@
           ]
         },
         {
-          "logicalId": "XcaApiTargetGroup",
+          "logicalId": "ServiceApiTargetGroup",
           "resourceType": "AWS::ElasticLoadBalancingV2::TargetGroup",
           "action": "modify",
           "propertyChanges": [
@@ -579,11 +579,11 @@
               "path": "Conditions[0].Values",
               "changeType": "modify",
               "oldValue": [
-                "/xca/*"
+                "/service/*"
               ],
               "newValue": [
-                "/xca/*",
-                "/api/v1/xca/*"
+                "/service/*",
+                "/api/v1/service/*"
               ]
             },
             {
@@ -646,19 +646,19 @@
           ]
         },
         {
-          "logicalId": "SoapFaultMetricFilter",
+          "logicalId": "ProcessingFaultMetricFilter",
           "resourceType": "AWS::Logs::MetricFilter",
           "action": "add",
           "propertyChanges": [
             {
               "path": "FilterPattern",
               "changeType": "add",
-              "newValue": "{ $.message = \"SOAP_FAULT\" }"
+              "newValue": "{ $.message = \"PROCESSING_FAULT\" }"
             },
             {
               "path": "MetricTransformations[0].MetricName",
               "changeType": "add",
-              "newValue": "SoapFaultCount"
+              "newValue": "ProcessingFaultCount"
             }
           ]
         },
@@ -670,7 +670,7 @@
             {
               "path": "Name",
               "changeType": "add",
-              "newValue": "/nir/int/xca/service-version"
+              "newValue": "/demo/int/service/service-version"
             },
             {
               "path": "Value",
@@ -680,18 +680,18 @@
           ]
         },
         {
-          "logicalId": "QueryOrchestrationStateMachine",
+          "logicalId": "OrderWorkflowStateMachine",
           "resourceType": "AWS::StepFunctions::StateMachine",
           "action": "modify",
           "propertyChanges": [
             {
-              "path": "Definition.ResolveGateway.TimeoutSeconds",
+              "path": "Definition.ResolvePartner.TimeoutSeconds",
               "changeType": "modify",
               "oldValue": 5,
               "newValue": 10
             },
             {
-              "path": "Definition.InvokeRegistryQuery.Retry",
+              "path": "Definition.InvokePartnerLookup.Retry",
               "changeType": "add",
               "newValue": [
                 {
@@ -774,15 +774,15 @@
             {
               "path": "ApiMappingKey",
               "changeType": "modify",
-              "oldValue": "xca",
-              "newValue": "api/xca",
+              "oldValue": "service",
+              "newValue": "api/service",
               "requiresReplacement": true
             },
             {
               "path": "DomainName",
               "changeType": "modify",
-              "oldValue": "main-xca-gateway.int.nir.national.nhs.uk",
-              "newValue": "gateway.int.nir.national.nhs.uk",
+              "oldValue": "main-service-gateway.int.demo.example.internal",
+              "newValue": "gateway.int.demo.example.internal",
               "requiresReplacement": true
             }
           ],
@@ -796,7 +796,7 @@
             {
               "path": "Name",
               "changeType": "delete",
-              "oldValue": "legacy-xca.int.nir.national.nhs.uk."
+              "oldValue": "legacy-service.int.demo.example.internal."
             },
             {
               "path": "Type",
@@ -813,7 +813,7 @@
             {
               "path": "Name",
               "changeType": "add",
-              "newValue": "gateway.int.nir.national.nhs.uk."
+              "newValue": "gateway.int.demo.example.internal."
             },
             {
               "path": "Type",
@@ -823,7 +823,7 @@
             {
               "path": "AliasTarget",
               "changeType": "add",
-              "newValue": "dualstack.alb-nir-int-1712360911.eu-west-2.elb.amazonaws.com."
+              "newValue": "dualstack.alb-demo-int-1712360911.eu-west-2.elb.amazonaws.com."
             }
           ]
         },
@@ -924,8 +924,8 @@
         {
           "name": "AlbDnsName",
           "action": "modify",
-          "oldValue": "alb-nir-int-1712360911.eu-west-2.elb.amazonaws.com",
-          "newValue": "alb-nir-int-2048129922.eu-west-2.elb.amazonaws.com"
+          "oldValue": "alb-demo-int-1712360911.eu-west-2.elb.amazonaws.com",
+          "newValue": "alb-demo-int-2048129922.eu-west-2.elb.amazonaws.com"
         },
         {
           "name": "ServiceVersion",
@@ -935,7 +935,7 @@
         {
           "name": "LegacyCertMigrationFunctionArn",
           "action": "delete",
-          "oldValue": "arn:aws:lambda:eu-west-2:123456789012:function:nir-int-legacy-cert-migrate"
+          "oldValue": "arn:aws:lambda:eu-west-2:123456789012:function:demo-int-legacy-cert-migrate"
         }
       ],
       "notices": [
@@ -950,7 +950,7 @@
       ]
     },
     {
-      "stackName": "NIR-XCA-Int-ObservabilityStack",
+      "stackName": "Demo-Service-Int-ObservabilityStack",
       "hasDifferences": true,
       "changeSetMode": "templateOnly",
       "approvalLevel": "never",
@@ -1057,7 +1057,7 @@
             {
               "path": "DashboardName",
               "changeType": "add",
-              "newValue": "nir-int-operational"
+              "newValue": "demo-int-operational"
             }
           ]
         },
@@ -1115,7 +1115,7 @@
         {
           "name": "DashboardUrl",
           "action": "add",
-          "newValue": "https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#dashboards:name=nir-int-operational"
+          "newValue": "https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#dashboards:name=demo-int-operational"
         }
       ],
       "notices": []

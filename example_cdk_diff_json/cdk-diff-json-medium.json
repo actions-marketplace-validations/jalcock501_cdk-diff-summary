@@ -19,7 +19,7 @@
   },
   "stacks": [
     {
-      "stackName": "NIR-XCA-Int-AppStack",
+      "stackName": "Demo-Service-Int-AppStack",
       "hasDifferences": true,
       "changeSetMode": "readOnly",
       "approvalLevel": "broadening",
@@ -45,7 +45,7 @@
       ],
       "iamStatementChanges": [
         {
-          "target": "Iti38QueryHandler/ServiceRole/DefaultPolicy",
+          "target": "OrderQueryHandler/ServiceRole/DefaultPolicy",
           "action": "add",
           "statement": {
             "effect": "Allow",
@@ -55,12 +55,12 @@
               "ssm:GetParameters"
             ],
             "resources": [
-              "arn:aws:ssm:eu-west-2:123456789012:parameter/nir/int/xca/*"
+              "arn:aws:ssm:eu-west-2:123456789012:parameter/demo/int/service/*"
             ]
           }
         },
         {
-          "target": "GatewayLookupFunction/ServiceRole/DefaultPolicy",
+          "target": "PartnerLookupFunction/ServiceRole/DefaultPolicy",
           "action": "modify",
           "statement": {
             "effect": "Allow",
@@ -69,14 +69,14 @@
               "dynamodb:Query"
             ],
             "resources": [
-              "arn:aws:dynamodb:eu-west-2:123456789012:table/nir-gateway-int"
+              "arn:aws:dynamodb:eu-west-2:123456789012:table/demo-gateway-int"
             ]
           }
         }
       ],
       "securityGroupChanges": [
         {
-          "securityGroup": "XcaAlbSecurityGroup",
+          "securityGroup": "ServiceAlbSecurityGroup",
           "direction": "ingress",
           "protocol": "tcp",
           "port": 443,
@@ -94,7 +94,7 @@
           "new": null
         },
         {
-          "securityGroup": "SoapWorkerSecurityGroup",
+          "securityGroup": "MessageWorkerSecurityGroup",
           "direction": "ingress",
           "protocol": "tcp",
           "port": 9443,
@@ -105,7 +105,7 @@
       ],
       "resources": [
         {
-          "logicalId": "Iti38QueryHandler",
+          "logicalId": "OrderQueryHandler",
           "resourceType": "AWS::Lambda::Function",
           "action": "modify",
           "propertyChanges": [
@@ -116,7 +116,7 @@
               "newValue": "8c01a93f.zip"
             },
             {
-              "path": "Environment.Variables.LOG_RAW_SOAP",
+              "path": "Environment.Variables.LOG_RAW_PAYLOAD",
               "changeType": "add",
               "newValue": "true"
             },
@@ -140,20 +140,20 @@
             }
           ],
           "metadata": {
-            "service": "iti-38",
+            "service": "order-query",
             "runtime": "python3.13"
           }
         },
         {
-          "logicalId": "XcaApiTaskDefinition",
+          "logicalId": "ServiceApiTaskDefinition",
           "resourceType": "AWS::ECS::TaskDefinition",
           "action": "modify",
           "propertyChanges": [
             {
               "path": "ContainerDefinitions[0].Image",
               "changeType": "modify",
-              "oldValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/nir-xca:int-20260506.3",
-              "newValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/nir-xca:int-20260508.7",
+              "oldValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/demo-service:int-20260506.3",
+              "newValue": "123456789012.dkr.ecr.eu-west-2.amazonaws.com/demo-service:int-20260508.7",
               "requiresReplacement": true
             },
             {
@@ -209,7 +209,7 @@
             {
               "path": "Name",
               "changeType": "delete",
-              "oldValue": "legacy-xca.int.nir.national.nhs.uk."
+              "oldValue": "legacy-service.int.demo.example.internal."
             }
           ]
         }
